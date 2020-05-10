@@ -7,12 +7,8 @@ const fs = require("fs");
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
-const haveMore = true;
 
 console.log("Hello welcome to Employee Summary!");
-
-
-
 
 const questionsInitial = [
     {
@@ -34,7 +30,7 @@ const questionsInitial = [
         type: "list",
         name: "user",
         message: "What type of user are you?",
-        choices: ['Manager', 'Engineer', 'Intern', 'I am done entering data']
+        choices: ['Manager', 'Engineer', 'Intern', 'Quit']
     }
 ];
 
@@ -62,29 +58,58 @@ const questionSchool = [
     }
 ];
 
+
 inquirer.prompt(questionsInitial).then(answers => {
-    console.log(answers, null, '  ');
-    
+    var name = answers.name;
+    var id = answers.employeeId;
+    var email = answers.email;
+    var employees = [];
     if (answers.user === "Manager") {
-        inquirer.prompt(questionOffice).then(answers => {
-         console.log("Ok you are a manager.");
-         return;   
-        });  
+        inquirer.prompt(questionOffice).then(answersTwo => {
+            var office = answersTwo.office;
+            var manager = new Manager(name, id, email, office);
+            employees.push(manager);
+            // console.log(employees);
+            const data = render(employees);
+            fs.writeFile('output/team.html', data, (err) => {
+                if (err) throw err;
+                console.log('The file has been saved!');
+            });
+        });
     } else if (answers.user === "Engineer") {
-        
-        inquirer.prompt(questionGithub).then(answers => {
-            console.log("Ok you are an Engineer.");
-            return;  
+        inquirer.prompt(questionGithub).then(answersTwo => {
+            var github = answersTwo.github;
+            var engineer = new Engineer(name, id, email, github);
+            employees.push(engineer);
+            // console.log(employees);
+            const data = render(employees);
+            fs.writeFile('output/team.html', data, (err) => {
+                if (err) throw err;
+                console.log('The file has been saved!');
+            });
         });
     } else if (answers.user === "Intern") {
-        inquirer.prompt(questionSchool).then(answers => {
-            console.log("Ok you are an intern.");
-            return; 
+        inquirer.prompt(questionSchool).then(answersTwo => {
+            var school = answersTwo.school;
+            var intern = new Intern(name, id, email, school);
+            employees.push(intern);
+            // console.log(employees);
+            const data = render(employees);
+            fs.writeFile(outputPath, data, (err) => {
+                if (err) throw err;
+                console.log('The file has been saved!');
+            });
         });
     } else {
-        console.log("That is it.");
+        console.log("Goodbye!");
     }
+    
+
 });
+
+
+
+
 
 
 // Write code to use inquirer to gather information about the development team members,
